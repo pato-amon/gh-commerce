@@ -1,12 +1,15 @@
 import express from "express";
+import cors from "cors";
 import prisma from "./prisma";
 import {
     validateProductName,
     validateProductPrice
 } from "./validators/productValidator";
 import { getProducts, getProduct, createNewProduct, updateExitingProduct, deleteExistingProduct } from "./controllers/productController";
+
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 app.get("/", (req, res) => {
