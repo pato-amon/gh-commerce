@@ -5,7 +5,7 @@ import {
     validateProductName,
     validateProductPrice
 } from "./validators/productValidator";
-import { getProducts, getProduct, createNewProduct, updateExitingProduct, deleteExistingProduct } from "./controllers/productController";
+import { getProducts, getProduct, createNewProduct, updateExistingProduct, deleteExistingProduct } from "./controllers/productController";
 
 const app = express();
 
@@ -28,7 +28,7 @@ app.get("/api/products/:id", getProduct);
 app.post("/api/products", createNewProduct);
 
 // PATCH update a product in PostgreSQL
-app.patch("/api/products/:id", updateExitingProduct);
+app.patch("/api/products/:id", updateExistingProduct);
 
 // DELETE a product from PostgreSQL
 app.delete("/api/products/:id", deleteExistingProduct);

@@ -23,10 +23,8 @@ export async function createProduct(name: string, price: number) {
 export async function updateProduct(
     id: number, data: { name?: string; price?: number }) {
     return await prisma.products.update({
-        where: {
-            id: id
-        },
-        data: data
+        where: { id },
+        data,
     });
 }
 

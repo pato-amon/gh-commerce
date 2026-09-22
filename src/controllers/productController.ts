@@ -77,7 +77,7 @@ export async function createNewProduct(req: Request, res: Response) {
     }
 }
 
-export async function updateExitingProduct(
+export async function updateExistingProduct(
     req: Request,
     res: Response
 ) {
