@@ -11,7 +11,6 @@ import {
     validateProductName,
     validateProductPrice
 } from "../validators/productValidator"
-import { request } from "node:http";
 
 export async function getProducts(req: Request, res: Response) {
     try {

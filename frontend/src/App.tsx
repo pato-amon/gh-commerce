@@ -14,6 +14,8 @@ function App() {
   const [price, setPrice] = useState("");
   const [editingProduct, setEditingProduct]
     = useState<Product | null>(null);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const fetchProducts = async () => {
     const response = await fetch("http://localhost:3000/api/products");
@@ -28,45 +30,84 @@ function App() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (editingProduct) {
-      const response = await fetch(`http://localhost:3000/api/products/${editingProduct.id}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: name,
-          price: Number(price),
-        }),
-      });
+    setError("");
 
-      const data = await response.json();
+    if (name.trim() === "") {
+      setError("Product name is required");
+      return;
+    }
 
-      console.log(data);
+    if (price === "") {
+      setError("Price is required");
+      return;
+    }
 
-      setEditingProduct(null);
-    } else {
+    if (Number(price) <= 0) {
+      setError("Price must be greater than 0");
+      return;
+    }
 
-      const response = await fetch("http://localhost:3000/api/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          price: Number(price),
-        }),
-      });
+    setLoading(true);
 
-      const data = await response.json();
+    try {
+      if (editingProduct) {
+        const response = await fetch(
+          `http://localhost:3000/api/products/${editingProduct.id}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name,
+              price: Number(price),
+            }),
+          }
+        );
 
-      console.log(data);
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.message || "Something went wrong");
+          return;
+        }
+
+        console.log(data);
+
+        setEditingProduct(null);
+      } else {
+        const response = await fetch(
+          "http://localhost:3000/api/products",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name,
+              price: Number(price),
+            }),
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.message || "Something went wrong");
+          return;
+        }
+
+        console.log(data);
+      }
 
       setName("");
       setPrice("");
 
-      fetchProducts();
-
+      await fetchProducts();
+    } catch (error) {
+      setError("Unable to connect to the server");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -83,6 +124,11 @@ function App() {
   };
 
   const handleDelete = async (id: number) => {
+    const confirmed = window.confirm("Are you sure you want to delete this product?");
+
+    if (!confirmed) {
+      return;
+    }
     const response = await fetch(`http://localhost:3000/api/products/${id}`, {
       method: "DELETE",
     }
@@ -98,8 +144,11 @@ function App() {
     <div className="container">
       <h1>Ghana Commerce</h1>
 
-      <form onSubmit={handleSubmit} className="product-form">
-        <h2>Add Product</h2>
+      <form onSubmit={handleSubmit}
+        className="product-form">
+        <h2>{editingProduct ? "Edit Product" : "Add Product"}</h2>
+
+        {error && <div className="form-error">{error}</div>}
 
         <input
           type="text"
@@ -113,11 +162,14 @@ function App() {
           value={price}
           onChange={(e) => setPrice(e.target.value)}
         />
-        <button type="submit">{editingProduct ? "Update Product" : "Add Product"}
+        <button type="submit" disabled={loading}>
+          {loading
+            ? "Saving..."
+            : editingProduct
+              ? "Update Product"
+              : "Add Product"}
         </button>
       </form>
-
-      <h2>{editingProduct ? "Edit Product" : "Add Product"}</h2>
 
       <Products
         products={products}

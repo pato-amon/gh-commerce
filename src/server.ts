@@ -1,11 +1,6 @@
 import express from "express";
 import cors from "cors";
-import prisma from "./prisma";
-import {
-    validateProductName,
-    validateProductPrice
-} from "./validators/productValidator";
-import { getProducts, getProduct, createNewProduct, updateExistingProduct, deleteExistingProduct } from "./controllers/productController";
+import productRoutes from "./routes/productRoutes";
 
 const app = express();
 
@@ -18,20 +13,7 @@ app.get("/", (req, res) => {
     });
 });
 
-// GET all products from PostgreSQL
-app.get("/api/products", getProducts);
-
-// GET a single product by ID from PostgreSQL
-app.get("/api/products/:id", getProduct);
-
-// POST create a new product in PostgreSQL
-app.post("/api/products", createNewProduct);
-
-// PATCH update a product in PostgreSQL
-app.patch("/api/products/:id", updateExistingProduct);
-
-// DELETE a product from PostgreSQL
-app.delete("/api/products/:id", deleteExistingProduct);
+app.use("/api/products", productRoutes);
 
 app.listen(3000, () => {
     console.log("Server running on port 3000");
