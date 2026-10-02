@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 import {
     getAllProducts,
     getProductById,
@@ -12,19 +12,25 @@ import {
     validateProductPrice
 } from "../validators/productValidator"
 
-export async function getProducts(req: Request, res: Response) {
+export async function getProducts(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
     try {
         const products = await getAllProducts();
 
         res.json(products);
     } catch (error) {
-        res.status(500).json({
-            message: "Internal server error"
-        });
+        next(error);
     }
 }
 
-export async function getProduct(req: Request, res: Response) {
+export async function getProduct(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
     const id = Number(req.params.id);
 
     if (!Number.isInteger(id) || id <= 0) {
@@ -43,13 +49,15 @@ export async function getProduct(req: Request, res: Response) {
         }
         res.json(product);
     } catch (error) {
-        res.status(500).json({
-            message: "Internal server error"
-        });
+        next(error);
     }
 }
 
-export async function createNewProduct(req: Request, res: Response) {
+export async function createNewProduct(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
     const { name, price } = req.body;
 
     const nameError = validateProductName(name);
@@ -70,15 +78,14 @@ export async function createNewProduct(req: Request, res: Response) {
         const product = await createProduct(name, price);
         return res.status(201).json(product);
     } catch (error) {
-        return res.status(500).json({
-            message: "Internal server error"
-        })
+        next(error);
     }
 }
 
 export async function updateExistingProduct(
     req: Request,
-    res: Response
+    res: Response,
+    next: NextFunction
 ) {
     const id = Number(req.params.id);
     const { name, price } = req.body;
@@ -126,15 +133,14 @@ export async function updateExistingProduct(
         const updatedProduct = await updateProduct(id, data);
         return res.json(updatedProduct);
     } catch (error) {
-        return res.status(404).json({
-            message: "Product not found"
-        });
+        next(error);
     }
 }
 
 export async function deleteExistingProduct(
     req: Request,
-    res: Response
+    res: Response,
+    next: NextFunction
 ) {
     const id = Number(req.params.id);
 
@@ -152,8 +158,6 @@ export async function deleteExistingProduct(
             product: deletedProduct
         })
     } catch (error) {
-        return res.status(404).json({
-            message: "Product not found"
-        });
+        next(error);
     }
 }
