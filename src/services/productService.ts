@@ -12,10 +12,16 @@ export async function getProductById(id: number) {
     });
 }
 
-export async function createProduct(name: string, price: number) {
+export async function createProduct(
+    name: string,
+    price: number,
+    sku: string
+) {
     return prisma.products.create({
         data: {
-            name, price
+            name,
+            price,
+            sku
         }
     });
 }

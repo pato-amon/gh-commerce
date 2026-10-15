@@ -58,7 +58,7 @@ export async function createNewProduct(
     res: Response,
     next: NextFunction
 ) {
-    const { name, price } = req.body;
+    const { name, price, sku } = req.body;
 
     const nameError = validateProductName(name);
     if (nameError) {
@@ -75,7 +75,7 @@ export async function createNewProduct(
     }
 
     try {
-        const product = await createProduct(name, price);
+        const product = await createProduct(name, price, sku);
         return res.status(201).json(product);
     } catch (error) {
         next(error);
